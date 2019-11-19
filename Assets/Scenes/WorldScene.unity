@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 2bd8959f5fbd3644aa33af1a155fc147, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657755, g: 0.4964127, b: 0.57481825, a: 1}
+  m_IndirectSpecularColor: {r: 0.29678005, g: 0.6337189, b: 0.9937176, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -681,7 +681,7 @@ MonoBehaviour:
   chunkSize: 16
   worldheight: 1
   chunkheight: 100
-  initialWorldSize: 5
+  initialWorldSize: 1
   WaterHeight: 0
   chunk: {fileID: 1860415453659156, guid: bcc9f1d6519df594d9cf2c91993b457d, type: 3}
   PlayerStartPostion: {x: 0, y: 0, z: 0}
@@ -1011,7 +1011,7 @@ PrefabInstance:
     - target: {fileID: 20063914413677086, guid: e30efd502bb05f84b9072217a3725d08,
         type: 3}
       propertyPath: m_ClearFlags
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 20063914413677086, guid: e30efd502bb05f84b9072217a3725d08,
         type: 3}
@@ -1028,15 +1028,39 @@ PrefabInstance:
       propertyPath: m_BackGroundColor.b
       value: 0.89705884
       objectReference: {fileID: 0}
+    - target: {fileID: 20063914413677086, guid: e30efd502bb05f84b9072217a3725d08,
+        type: 3}
+      propertyPath: near clip plane
+      value: 0.01
+      objectReference: {fileID: 0}
     - target: {fileID: 136732473850804664, guid: e30efd502bb05f84b9072217a3725d08,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 136732473850804664, guid: e30efd502bb05f84b9072217a3725d08,
+        type: 3}
+      propertyPath: m_Height
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 143270861159161680, guid: e30efd502bb05f84b9072217a3725d08,
         type: 3}
       propertyPath: m_Radius
       value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 143270861159161680, guid: e30efd502bb05f84b9072217a3725d08,
         type: 3}
-      propertyPath: m_Radius
-      value: 0.25
+      propertyPath: m_Height
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 23603090746356026, guid: e30efd502bb05f84b9072217a3725d08,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4928250075216068, guid: e30efd502bb05f84b9072217a3725d08, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.75
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e30efd502bb05f84b9072217a3725d08, type: 3}

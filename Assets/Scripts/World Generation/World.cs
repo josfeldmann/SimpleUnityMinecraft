@@ -59,7 +59,7 @@ public class World : Singleton<World> {
 
         Player.SetActive(false);
 
-        Random.seed = seed;
+        Random.seed = System.DateTime.Now.Millisecond;
 
         WorldList = new Dictionary<Vector3, Chunk>();
         n = GetComponent<Noise>();

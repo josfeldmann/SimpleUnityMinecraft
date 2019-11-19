@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -324,9 +325,21 @@ public class Chunk : MonoBehaviour {
 
     // Use this for initialization
 
-    public void BuildChunk() {
+    private float DebugTime = 0;
+
+    public void BuildChunk()
+    {
+        DateTime before = DateTime.Now;
         BuildMesh();
+        DateTime after = DateTime.Now;
+        TimeSpan duration = after.Subtract(before);
+        Debug.Log("Determining Vertices: " + duration.Milliseconds);
+        before = DateTime.Now;
         CombineQuads();
+        after = DateTime.Now;
+        duration = after.Subtract(before);
+        Debug.Log("Rebuilding Mesh/Collider: " + duration.Milliseconds);
+
 
     }
 
