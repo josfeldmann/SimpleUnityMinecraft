@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Chunk : MonoBehaviour {
 
     public BlockType[,,] chunkData;
@@ -22,6 +23,10 @@ public class Chunk : MonoBehaviour {
         
     }
 
+
+    int x, z, y;
+    bool prevair, watertop
+
     public void BuildMap() {
 
         chunkData = new BlockType[World.Instance.chunkSize, World.Instance.chunkheight, World.Instance.chunkSize];
@@ -29,11 +34,11 @@ public class Chunk : MonoBehaviour {
        
         int currheight;
 
-        for (int x = 0; x < World.Instance.chunkSize; x++)
-            for (int z = 0; z < World.Instance.chunkSize; z++) {
-                bool prevair = true;
-                bool watertop = World.Instance.n.GenerateHeight(x + transform.position.x, z + transform.position.z) <= World.Instance.WaterHeight;
-                for (int y = World.Instance.chunkheight - 1; y > 0; y--) {
+        for (x = 0; x < World.Instance.chunkSize; x++)
+            for (z = 0; z < World.Instance.chunkSize; z++) {
+                prevair = true;
+                watertop = World.Instance.n.GenerateHeight(x + transform.position.x, z + transform.position.z) <= World.Instance.WaterHeight;
+                for ( y = World.Instance.chunkheight - 1; y > 0; y--) {
 
 
                     
@@ -72,34 +77,34 @@ public class Chunk : MonoBehaviour {
 
     public bool isEmpty(int x, int y, int z) {
 
-        try {
+       try {
             return chunkData[x, y, z] == BlockType.AIR;
         }
         catch (System.IndexOutOfRangeException) {
 
 
-            Vector3 OutsideChunk = (transform.position / World.Instance.chunkSize);
+            //Vector3 OutsideChunk = (transform.position / World.Instance.chunkSize);
 
 
-            if (x < 0) OutsideChunk.x -= 1;
-            else if (x >= World.Instance.chunkSize) OutsideChunk.x += 1;
+            //if (x < 0) OutsideChunk.x -= 1;
+            //else if (x >= World.Instance.chunkSize) OutsideChunk.x += 1;
 
-            if (z < 0) OutsideChunk.z -= 1;
-            else if (z >= World.Instance.chunkSize) OutsideChunk.z += 1;
+            //if (z < 0) OutsideChunk.z -= 1;
+            //else if (z >= World.Instance.chunkSize) OutsideChunk.z += 1;
 
-            World.Instance.WorldList.TryGetValue(OutsideChunk, out testChunk);
+            //World.Instance.WorldList.TryGetValue(OutsideChunk, out testChunk);
 
 
-            try {
+            //try {
 
-                return testChunk.chunkData[(x + World.Instance.chunkSize) % World.Instance.chunkSize,
-                                     y, (z + World.Instance.chunkSize) % World.Instance.chunkSize] == BlockType.AIR;
+              //  return testChunk.chunkData[(x + World.Instance.chunkSize) % World.Instance.chunkSize,
+                                //     y, (z + World.Instance.chunkSize) % World.Instance.chunkSize] == BlockType.AIR;
                 
-            } catch {
+            //} catch {
                 
-            }
+            //}
             
-            return false;
+         //   return false;
         }
     }
 
@@ -107,16 +112,22 @@ public class Chunk : MonoBehaviour {
 
     public void BuildMesh() {
         
-        for (int x = 0; x < World.Instance.chunkSize; x++) {
+        for (x = 1; x < World.Instance.chunkSize -1; x++) {
             vec.x = x;
-            for (int z = 0; z < World.Instance.chunkSize; z++) {
+            for (z = 1; z < World.Instance.chunkSize -1; z++) {
                 vec.z = z;
-                for (int y = 0; y < World.Instance.chunkheight; y++) {
+                for (y = 1; y < World.Instance.chunkheight -1; y++) {
                     vec.y = y;
 
                     
-                   
-                    Draw(chunkData[x,y,z],isEmpty(x, y + 1, z), isEmpty(x, y - 1, z), isEmpty(x, y, z + 1), isEmpty(x, y, z - 1), isEmpty(x - 1, y, z), isEmpty(x + 1, y, z));
+                    if (bType != BlockType.AIR)
+                    Draw(chunkData[x,y,z],
+                    chunkData[x, y + 1, z] == BlockType.AIR, 
+                    chunkData[x, y - 1, z] == BlockType.AIR,
+                    chunkData[x, y, z + 1] == BlockType.AIR,
+                    chunkData[x, y, z - 1] == BlockType.AIR, 
+                    chunkData[x - 1, y, z] == BlockType.AIR,
+                    chunkData[x + 1, y, z] == BlockType.AIR);
 
 
 
@@ -150,7 +161,6 @@ public class Chunk : MonoBehaviour {
 
     public void Draw(BlockType bType, bool top, bool bot, bool front, bool back, bool left, bool right)
     {
-        if (bType == BlockType.AIR) return;
         if (front)
             CreateQuad(bType,Cubeside.FRONT, vec);
         if (back)
@@ -329,21 +339,20 @@ public class Chunk : MonoBehaviour {
 
     public void BuildChunk()
     {
-        DateTime before = DateTime.Now;
+        //DateTime before = DateTime.Now;
         BuildMesh();
-        DateTime after = DateTime.Now;
-        TimeSpan duration = after.Subtract(before);
-        Debug.Log("Determining Vertices: " + duration.Milliseconds);
-        before = DateTime.Now;
+        //DateTime after = DateTime.Now;
+        //TimeSpan duration = after.Subtract(before);
+      //  Debug.Log("Determining Vertices: " + duration.Milliseconds);
+        //before = DateTime.Now;
         CombineQuads();
-        after = DateTime.Now;
-        duration = after.Subtract(before);
-        Debug.Log("Rebuilding Mesh/Collider: " + duration.Milliseconds);
+        //after = DateTime.Now;
+        //duration = after.Subtract(before);
+        //Debug.Log("Rebuilding Mesh/Collider: " + duration.Milliseconds);
 
 
     }
 
-    public List<CombineInstance> CI = new List<CombineInstance>();
 
 
     public void DeleteBlock(Vector3Int bl)
@@ -390,11 +399,6 @@ public class Chunk : MonoBehaviour {
         Mc.sharedMesh = mf.mesh;
         
 
-
-    }
-
-    // Update is called once per frame
-    void Update() {
 
     }
 }
