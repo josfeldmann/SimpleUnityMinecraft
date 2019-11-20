@@ -88,7 +88,7 @@ public class World : Singleton<World> {
                   c.Value.StartCoroutine(c.Value.ChunkRoutine((int)-initialWorldSize, (int) c.Key.y, (int)c.Key.z));
               }*/
 
-            c.Value.BuildChunk();
+            c.Value.ReBuildChunk();
 
             current++;
             LoadingBar.fillAmount = (float)current / (float)total;

@@ -2,17 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Unity.Burst;
+using Unity.Jobs;
+using Unity.Mathematics;
 
 public class Chunk : MonoBehaviour {
 
     public BlockType[,,] chunkData;
    
-    public GameObject cursorObj;
 
     public IEnumerator ChunkRoutine(int x, int y, int z) {
 
-        BuildChunk();
+        ReBuildChunk();
 
         Chunk next;
         if (World.Instance.WorldList.TryGetValue(new Vector3(x+1, y, z), out next)) {
@@ -25,7 +26,7 @@ public class Chunk : MonoBehaviour {
 
 
     int x, z, y;
-    bool prevair, watertop
+    bool prevair, watertop;
 
     public void BuildMap() {
 
@@ -77,64 +78,17 @@ public class Chunk : MonoBehaviour {
 
     public bool isEmpty(int x, int y, int z) {
 
-       try {
-            return chunkData[x, y, z] == BlockType.AIR;
-        }
-        catch (System.IndexOutOfRangeException) {
-
-
-            //Vector3 OutsideChunk = (transform.position / World.Instance.chunkSize);
-
-
-            //if (x < 0) OutsideChunk.x -= 1;
-            //else if (x >= World.Instance.chunkSize) OutsideChunk.x += 1;
-
-            //if (z < 0) OutsideChunk.z -= 1;
-            //else if (z >= World.Instance.chunkSize) OutsideChunk.z += 1;
-
-            //World.Instance.WorldList.TryGetValue(OutsideChunk, out testChunk);
-
-
-            //try {
-
-              //  return testChunk.chunkData[(x + World.Instance.chunkSize) % World.Instance.chunkSize,
-                                //     y, (z + World.Instance.chunkSize) % World.Instance.chunkSize] == BlockType.AIR;
-                
-            //} catch {
-                
-            //}
             
-         //   return false;
-        }
+
+
+            return chunkData[x, y, z] == BlockType.AIR;
+
+        
     }
 
     public Vector3 vec = new Vector3();
 
-    public void BuildMesh() {
-        
-        for (x = 1; x < World.Instance.chunkSize -1; x++) {
-            vec.x = x;
-            for (z = 1; z < World.Instance.chunkSize -1; z++) {
-                vec.z = z;
-                for (y = 1; y < World.Instance.chunkheight -1; y++) {
-                    vec.y = y;
-
-                    
-                    if (bType != BlockType.AIR)
-                    Draw(chunkData[x,y,z],
-                    chunkData[x, y + 1, z] == BlockType.AIR, 
-                    chunkData[x, y - 1, z] == BlockType.AIR,
-                    chunkData[x, y, z + 1] == BlockType.AIR,
-                    chunkData[x, y, z - 1] == BlockType.AIR, 
-                    chunkData[x - 1, y, z] == BlockType.AIR,
-                    chunkData[x + 1, y, z] == BlockType.AIR);
-
-
-
-                }
-            }
-        }
-    }
+   
 
     public List<Vector3> vertices = new List<Vector3>();
     public List<Vector3> normals = new List<Vector3>();
@@ -162,17 +116,17 @@ public class Chunk : MonoBehaviour {
     public void Draw(BlockType bType, bool top, bool bot, bool front, bool back, bool left, bool right)
     {
         if (front)
-            CreateQuad(bType,Cubeside.FRONT, vec);
+            CreateQuad(bType,Cubeside.FRONT);
         if (back)
-            CreateQuad(bType, Cubeside.BACK, vec);
+            CreateQuad(bType, Cubeside.BACK);
         if (top)
-            CreateQuad(bType, Cubeside.TOP, vec);
+            CreateQuad(bType, Cubeside.TOP);
         if (bot)
-            CreateQuad(bType, Cubeside.BOTTOM, vec);
+            CreateQuad(bType, Cubeside.BOTTOM);
         if (left)
-            CreateQuad(bType, Cubeside.LEFT, vec);
+            CreateQuad(bType, Cubeside.LEFT);
         if (right)
-            CreateQuad(bType, Cubeside.RIGHT, vec);
+            CreateQuad(bType, Cubeside.RIGHT);
     }
 
 
@@ -180,7 +134,7 @@ public class Chunk : MonoBehaviour {
 
     int counter = 0;
 
-    void CreateQuad(BlockType bType, Cubeside side, Vector3 position)
+    void CreateQuad(BlockType bType, Cubeside side)
     {
 
         
@@ -217,10 +171,10 @@ public class Chunk : MonoBehaviour {
             case Cubeside.BOTTOM:
                // print("Bot");
                 
-                vertices.Add(p0 + position);
-                vertices.Add(p1 + position);
-                vertices.Add(p2 + position);
-                vertices.Add(p3 + position);
+                vertices.Add(p0 + vec);
+                vertices.Add(p1 + vec);
+                vertices.Add(p2 + vec);
+                vertices.Add(p3 + vec);
 
 
 
@@ -233,10 +187,10 @@ public class Chunk : MonoBehaviour {
                 break;
             case Cubeside.TOP:
                 
-                vertices.Add(p7 + position);
-                vertices.Add(p6 + position);
-                vertices.Add(p5 + position);
-                vertices.Add(p4 + position);
+                vertices.Add(p7 + vec);
+                vertices.Add(p6 + vec);
+                vertices.Add(p5 + vec);
+                vertices.Add(p4 + vec);
 
                 normals.Add(Vector3.up);
                 normals.Add(Vector3.up);
@@ -248,10 +202,10 @@ public class Chunk : MonoBehaviour {
             case Cubeside.LEFT:
                 
 
-                vertices.Add(p7 + position);
-                vertices.Add(p4 + position);
-                vertices.Add(p0 + position);
-                vertices.Add(p3 + position);
+                vertices.Add(p7 + vec);
+                vertices.Add(p4 + vec);
+                vertices.Add(p0 + vec);
+                vertices.Add(p3 + vec);
                 normals.Add(Vector3.left);
                 normals.Add(Vector3.left);
                 normals.Add(Vector3.left);
@@ -262,10 +216,10 @@ public class Chunk : MonoBehaviour {
             case Cubeside.RIGHT:
                 
 
-                vertices.Add(p5 + position);
-                vertices.Add(p6 + position);
-                vertices.Add(p2 + position);
-                vertices.Add(p1 + position);
+                vertices.Add(p5 + vec);
+                vertices.Add(p6 + vec);
+                vertices.Add(p2 + vec);
+                vertices.Add(p1 + vec);
                 normals.Add(Vector3.right);
                 normals.Add(Vector3.right);
                 normals.Add(Vector3.right);
@@ -275,10 +229,10 @@ public class Chunk : MonoBehaviour {
                 break;
             case Cubeside.FRONT:
                 
-                vertices.Add(p4 + position);
-                vertices.Add(p5 + position);
-                vertices.Add(p1 + position);
-                vertices.Add(p0 + position);
+                vertices.Add(p4 + vec);
+                vertices.Add(p5 + vec);
+                vertices.Add(p1 + vec);
+                vertices.Add(p0 + vec);
 
                 normals.Add(Vector3.forward);
                 normals.Add(Vector3.forward);
@@ -290,10 +244,10 @@ public class Chunk : MonoBehaviour {
             case Cubeside.BACK:
                 
 
-                vertices.Add(p6 + position);
-                vertices.Add(p7 + position);
-                vertices.Add(p3 + position);
-                vertices.Add(p2 + position);
+                vertices.Add(p6 + vec);
+                vertices.Add(p7 + vec);
+                vertices.Add(p3 + vec);
+                vertices.Add(p2 + vec);
 
                 normals.Add(Vector3.back);
                 normals.Add(Vector3.back);
@@ -330,27 +284,57 @@ public class Chunk : MonoBehaviour {
 
 
 
+    public void ReBuildChunk(){
+        StartCoroutine(BuildChunkIENum());
+    }
 
 
 
     // Use this for initialization
 
     private float DebugTime = 0;
+    private bool beingModified = false;
 
-    public void BuildChunk()
+
+    private  IEnumerator BuildChunkIENum()
     {
-        //DateTime before = DateTime.Now;
-        BuildMesh();
-        //DateTime after = DateTime.Now;
-        //TimeSpan duration = after.Subtract(before);
-      //  Debug.Log("Determining Vertices: " + duration.Milliseconds);
-        //before = DateTime.Now;
+
+        int ymax = World.Instance.chunkheight - 1;
+        int xmax = World.Instance.chunkSize-1;
+        int zmax = World.Instance.chunkSize-1;
+        beingModified = true;
+        
+        for (x = 0; x < World.Instance.chunkSize; x++) {
+            vec.x = x;
+            if (x%3 == 0)yield return 0;
+            for (z = 0; z < World.Instance.chunkSize; z++) {
+                vec.z = z;
+                for (y = 0; y < World.Instance.chunkheight;y++) {
+                    vec.y = y;
+
+                    
+                    if (chunkData[x,y,z] != BlockType.AIR)
+                    Draw(chunkData[x,y,z],
+                    y == ymax || chunkData[x, y + 1, z] == BlockType.AIR, 
+                    y > 0 && chunkData[x, y - 1, z] == BlockType.AIR,
+                    z == zmax || chunkData[x, y, z + 1] == BlockType.AIR,
+                    z == 0 || chunkData[x, y, z - 1] == BlockType.AIR, 
+                    x == 0 || chunkData[x - 1, y, z] == BlockType.AIR,
+                    x == xmax || chunkData[x + 1, y, z] == BlockType.AIR);
+
+
+
+                }
+            }
+        }
+    
+
+
+
+        
         CombineQuads();
-        //after = DateTime.Now;
-        //duration = after.Subtract(before);
-        //Debug.Log("Rebuilding Mesh/Collider: " + duration.Milliseconds);
 
-
+        beingModified = false;
     }
 
 
@@ -358,7 +342,7 @@ public class Chunk : MonoBehaviour {
     public void DeleteBlock(Vector3Int bl)
     {
         
-        if (chunkData[bl.x, bl.y, bl.z] != BlockType.AIR)
+        if (chunkData[bl.x, bl.y, bl.z] != BlockType.AIR && !beingModified)
         {
             chunkData[bl.x, bl.y, bl.z] = BlockType.AIR;
             triangles.Clear();
@@ -366,7 +350,7 @@ public class Chunk : MonoBehaviour {
             uvs.Clear();
             normals.Clear();
             counter = 0;
-            BuildChunk();
+            ReBuildChunk();
         }
 
 
@@ -374,9 +358,11 @@ public class Chunk : MonoBehaviour {
 
     void CombineQuads() {
 
-       // print("GotHere" + Time.time);
+        print("UpdatingMesh " + Time.time);
 
         Mesh m = new Mesh();
+
+        float3[] fa = new float3[3];
         m.vertices = vertices.ToArray();
         m.triangles = triangles.ToArray();
         m.uv = uvs.ToArray();
