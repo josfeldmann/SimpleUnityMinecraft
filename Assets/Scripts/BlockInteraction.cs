@@ -18,7 +18,11 @@ public class BlockInteraction : MonoBehaviour {
 
             DestroyBlock();
 
-        }	
+    }
+
+    if (Input.GetMouseButtonDown(1)){
+        AddBlock();
+    }
 	}
 
     public void DestroyBlock() {
@@ -48,5 +52,33 @@ public class BlockInteraction : MonoBehaviour {
         }
 
     }
+
+
+public void AddBlock(){
+    RaycastHit hit;
+        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, 10)) {
+
+            if (hit.collider.tag == "Chunk") {
+
+                TestClick.transform.position = hit.point;
+
+                Vector3 localIndex = hit.point - hit.transform.position + (new Vector3(0.5f, 0.5f, 0.5f));
+                if (hit.normal.y == 1.0f) localIndex.y -= 0.5f;
+                if (hit.normal.x == 1.0f) localIndex.x -= 0.5f;
+                if (hit.normal.z == 1.0f) localIndex.z -= 0.5f;
+                tm.text = localIndex.ToString() + " Normal: " + hit.normal.ToString();
+
+                print(new Vector3Int((int)(localIndex.x), (int)(localIndex.y), (int)(localIndex.z)).ToString());
+
+
+
+                hit.transform.GetComponent<Chunk>().AddBlock(new Vector3Int((int)(localIndex.x), (int)(localIndex.y), (int)(localIndex.z)) + new Vector3Int((int)hit.normal.x, (int)hit.normal.y, (int)hit.normal.z), BlockType.DIRT);
+                
+                
+            }
+
+        }
+}
+
 
 }

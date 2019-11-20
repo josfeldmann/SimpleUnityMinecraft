@@ -299,6 +299,12 @@ public class Chunk : MonoBehaviour {
     private  IEnumerator BuildChunkIENum()
     {
 
+
+        DateTime before = DateTime.Now;
+
+
+
+
         int ymax = World.Instance.chunkheight - 1;
         int xmax = World.Instance.chunkSize-1;
         int zmax = World.Instance.chunkSize-1;
@@ -312,11 +318,22 @@ public class Chunk : MonoBehaviour {
                 for (y = 0; y < World.Instance.chunkheight;y++) {
                     vec.y = y;
 
-                    
+                    /*
+                    if (chunkData[x,y,z] != BlockType.AIR)
+                    Draw(chunkData[x,y,z],
+                    y < ymax && chunkData[x, y + 1, z] == BlockType.AIR, 
+                    y > 0 && chunkData[x, y - 1, z] == BlockType.AIR,
+                    z < zmax && chunkData[x, y, z + 1] == BlockType.AIR,
+                    z > 0 && chunkData[x, y, z - 1] == BlockType.AIR, 
+                    x > 0 && chunkData[x - 1, y, z] == BlockType.AIR,
+                    x < xmax && chunkData[x + 1, y, z] == BlockType.AIR);
+                    */
+
+
                     if (chunkData[x,y,z] != BlockType.AIR)
                     Draw(chunkData[x,y,z],
                     y == ymax || chunkData[x, y + 1, z] == BlockType.AIR, 
-                    y > 0 && chunkData[x, y - 1, z] == BlockType.AIR,
+                    y == 0 || chunkData[x, y - 1, z] == BlockType.AIR,
                     z == zmax || chunkData[x, y, z + 1] == BlockType.AIR,
                     z == 0 || chunkData[x, y, z - 1] == BlockType.AIR, 
                     x == 0 || chunkData[x - 1, y, z] == BlockType.AIR,
@@ -327,15 +344,46 @@ public class Chunk : MonoBehaviour {
                 }
             }
         }
+
+
+        DateTime after = DateTime.Now; 
+        TimeSpan duration = after.Subtract(before);
+      //  Debug.Log("Vertices Took: " + duration.Milliseconds);
     
 
 
-
+before = DateTime.Now;
         
         CombineQuads();
 
+
+     after = DateTime.Now; 
+     duration = after.Subtract(before);
+     //Debug.Log("buildingMesh Took: " + duration.Milliseconds);
+
         beingModified = false;
+
+
+        yield return null;
     }
+
+     public void AddBlock(Vector3Int bl, BlockType bType)
+    {
+        
+        if (chunkData[bl.x, bl.y, bl.z] == BlockType.AIR && !beingModified)
+        {
+            chunkData[bl.x, bl.y, bl.z] = bType;
+            triangles.Clear();
+            vertices.Clear();
+            uvs.Clear();
+            normals.Clear();
+            counter = 0;
+            ReBuildChunk();
+        }
+
+
+    }
+
 
 
 

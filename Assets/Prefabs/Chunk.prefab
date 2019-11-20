@@ -77,7 +77,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d97f297e5520e864ea40935ae179ae47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cursorObj: {fileID: 1749360515136252}
   vec: {x: 0, y: 0, z: 0}
   vertices: []
   normals: []

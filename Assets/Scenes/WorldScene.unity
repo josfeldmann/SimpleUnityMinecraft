@@ -680,7 +680,7 @@ MonoBehaviour:
   mat: {fileID: 2100000, guid: b64894e845e882d42ae941c743b6c2bb, type: 2}
   chunkSize: 20
   worldheight: 1
-  chunkheight: 100
+  chunkheight: 50
   initialWorldSize: 5
   WaterHeight: 0
   chunk: {fileID: 1860415453659156, guid: bcc9f1d6519df594d9cf2c91993b457d, type: 3}
@@ -959,6 +959,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1631412814504668, guid: e30efd502bb05f84b9072217a3725d08, type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4750926877671598, guid: e30efd502bb05f84b9072217a3725d08, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8
@@ -1066,6 +1070,10 @@ PrefabInstance:
         type: 3}
       propertyPath: gravity
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1702040060548032, guid: e30efd502bb05f84b9072217a3725d08, type: 3}
+      propertyPath: m_Layer
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e30efd502bb05f84b9072217a3725d08, type: 3}
