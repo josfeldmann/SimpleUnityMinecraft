@@ -18,7 +18,7 @@ public class World : Singleton<World> {
     public int initialWorldSize = 1;
     public int WaterHeight = 15;
     public GameObject chunk;
-    public Dictionary<Vector3, Chunk> WorldList;
+    public Dictionary<Vector3Int, Chunk> WorldList;
     public Vector3 PlayerStartPostion;
     public Noise n;
     public GameObject Player;
@@ -59,9 +59,9 @@ public class World : Singleton<World> {
 
         Player.SetActive(false);
 
-        Random.seed = System.DateTime.Now.Millisecond;
+        Random.seed = seed;
 
-        WorldList = new Dictionary<Vector3, Chunk>();
+        WorldList = new Dictionary<Vector3Int, Chunk>();
         n = GetComponent<Noise>();
         n.offsetX = Random.Range(0f, 99999f);
         n.offsetZ = Random.Range(0f, 99999f);
@@ -77,22 +77,21 @@ public class World : Singleton<World> {
                     
                     
                     GameObject gem = GameObject.Instantiate(chunk, new Vector3(x * chunkSize, y * chunkheight, z * chunkSize) , Quaternion.identity);
-                    gem.name = new Vector3(x, y, z).ToString();
-                    WorldList.Add(new Vector3(x, y, z), gem.GetComponent<Chunk>());
+                    gem.name = new Vector3Int(x, y, z).ToString();
+                    WorldList.Add(new Vector3Int(x, y, z), gem.GetComponent<Chunk>());
                     gem.GetComponent<Chunk>().BuildMap();
+                    
                     
                 }
 
-        foreach (KeyValuePair<Vector3, Chunk> c in WorldList) {
-            /*if (c.Key.x == -initialWorldSize) {
-                  c.Value.StartCoroutine(c.Value.ChunkRoutine((int)-initialWorldSize, (int) c.Key.y, (int)c.Key.z));
-              }*/
-
+        foreach (KeyValuePair<Vector3Int, Chunk> c in WorldList) {
+            c.Value.SetNeighbours(c.Key);
+            
             c.Value.ReBuildChunk();
 
             current++;
             LoadingBar.fillAmount = (float)current / (float)total;
-            yield return new WaitForSeconds(0.0f);
+            yield return 0;
 
         }
 

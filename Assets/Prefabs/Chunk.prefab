@@ -14,7 +14,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &4659297635317734
 Transform:
@@ -48,7 +48,7 @@ GameObject:
   m_TagString: Chunk
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!4 &4582233647565392
 Transform:
@@ -77,11 +77,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d97f297e5520e864ea40935ae179ae47, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ChunkIndex: {x: 0, y: 0, z: 0}
   vec: {x: 0, y: 0, z: 0}
   vertices: []
   normals: []
   uvs: []
   triangles: 
+  topNeighbour: {fileID: 0}
+  botNeighbour: {fileID: 0}
+  leftNeighbour: {fileID: 0}
+  rightNeighbour: {fileID: 0}
+  fronNeighbor: {fileID: 0}
+  backNeighbour: {fileID: 0}
 --- !u!23 &23803193035254578
 MeshRenderer:
   m_ObjectHideFlags: 0
