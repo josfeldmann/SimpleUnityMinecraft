@@ -47,7 +47,7 @@ public class BlockInteraction : MonoBehaviour {
 
                 Chunk c = hit.transform.GetComponent<Chunk>();
 
-                hit.transform.GetComponent<Chunk>().DeleteBlock(new Vector3Int((int)(localIndex.x), (int)(localIndex.y), (int)(localIndex.z)));
+                c.DeleteBlock(new Vector3Int((int)(localIndex.x), (int)(localIndex.y), (int)(localIndex.z)));
                 
                 
             }
@@ -75,7 +75,7 @@ public void AddBlock(){
 
 
 
-                hit.transform.GetComponent<Chunk>().AddBlock(new Vector3Int((int)(localIndex.x), (int)(localIndex.y), (int)(localIndex.z)) + new Vector3Int((int)hit.normal.x, (int)hit.normal.y, (int)hit.normal.z), BlockType.DIRT);
+                hit.transform.GetComponent<Chunk>().AddBlock(new Vector3Int((int)(localIndex.x), (int)(localIndex.y), (int)(localIndex.z)) + new Vector3Int((int)hit.normal.x, (int)hit.normal.y, (int)hit.normal.z), 2);
                 
                 
             

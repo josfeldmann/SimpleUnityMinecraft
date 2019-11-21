@@ -8,7 +8,11 @@ using Unity.Mathematics;
 
 public class Chunk : MonoBehaviour {
 
-    public BlockType[,,] chunkData;
+    public const int grass = 0, dirt = 1, stones = 2, water = 3, air = 250;
+
+
+
+    public int[,,] chunkData;
    
 
     float currChunkHeight;
@@ -55,7 +59,7 @@ public void SetNeighbours(Vector3Int vec1){
 
     public void BuildMap() {
 
-        chunkData = new BlockType[World.Instance.chunkSize, World.Instance.chunkheight, World.Instance.chunkSize];
+        chunkData = new int[World.Instance.chunkSize, World.Instance.chunkheight, World.Instance.chunkSize];
 
        
         int currheight;
@@ -70,9 +74,9 @@ public void SetNeighbours(Vector3Int vec1){
                     
                     if (World.Instance.n.fBM3D((int)(x + transform.position.x), (int)(y + transform.position.y), (int)(z + transform.position.z), 0.1f, 3) < 0.42f) {
                         if (prevair && watertop && y < World.Instance.WaterHeight)
-                            chunkData[x, y, z] = BlockType.WATER;
-                            else if (y < World.Instance.WaterHeight && prevair) chunkData[x, y, z] = BlockType.WATER;
-                            else chunkData[x, y, z] = BlockType.AIR;
+                            chunkData[x, y, z] = water;
+                            else if (y < World.Instance.WaterHeight && prevair) chunkData[x, y, z] = water;
+                            else chunkData[x, y, z] = air;
 
                     }
 
@@ -80,18 +84,18 @@ public void SetNeighbours(Vector3Int vec1){
                      else if (y + transform.position.y <= World.Instance.n.OldGenerateHeight(x + transform.position.x, z + transform.position.z)) {
                         if (prevair) {
                             prevair = false;
-                            chunkData[x, y, z] = BlockType.GRASS;
+                            chunkData[x, y, z] = grass;
                         }
                         else {
-                            chunkData[x, y, z] = BlockType.DIRT;
+                            chunkData[x, y, z] = dirt;
                         }
 
                     }
                     else if (y < World.Instance.WaterHeight) {
-                        chunkData[x, y, z] = BlockType.WATER;
+                        chunkData[x, y, z] = water;
                     }
                     else {
-                        chunkData[x, y, z] = BlockType.AIR;
+                        chunkData[x, y, z] = air;
                     }
                     
                 }
@@ -106,7 +110,7 @@ public void SetNeighbours(Vector3Int vec1){
             
 
 
-            return chunkData[x, y, z] == BlockType.AIR;
+            return chunkData[x, y, z] == air;
 
         
     }
@@ -138,7 +142,7 @@ public void SetNeighbours(Vector3Int vec1){
     Vector3 p6 = new Vector3(0.5f, 0.5f, -0.5f);
     Vector3 p7 = new Vector3(-0.5f, 0.5f, -0.5f);
 
-    public void Draw(BlockType bType, bool top, bool bot, bool front, bool back, bool left, bool right)
+    public void Draw(int bType, bool top, bool bot, bool front, bool back, bool left, bool right)
     {
         if (front)
             CreateQuad(bType,Cubeside.FRONT);
@@ -159,33 +163,33 @@ public void SetNeighbours(Vector3Int vec1){
 
     int counter = 0;
 
-    void CreateQuad(BlockType bType, Cubeside side)
+    void CreateQuad(int bType, Cubeside side)
     {
 
         
         
 
 
-        if (bType == BlockType.GRASS && side == Cubeside.TOP)
+        if (bType == grass && side == Cubeside.TOP)
         {
             uv00 = World.Instance.blockUVs[0, 0];
             uv10 = World.Instance.blockUVs[0, 1];
             uv01 = World.Instance.blockUVs[0, 2];
             uv11 = World.Instance.blockUVs[0, 3];
         }
-        else if (bType == BlockType.GRASS && side == Cubeside.BOTTOM)
+        else if (bType == grass && side == Cubeside.BOTTOM)
         {
-            uv00 = World.Instance.blockUVs[(int)(BlockType.DIRT + 1), 0];
-            uv10 = World.Instance.blockUVs[(int)(BlockType.DIRT + 1), 1];
-            uv01 = World.Instance.blockUVs[(int)(BlockType.DIRT + 1), 2];
-            uv11 = World.Instance.blockUVs[(int)(BlockType.DIRT + 1), 3];
+            uv00 = World.Instance.blockUVs[(dirt + 1), 0];
+            uv10 = World.Instance.blockUVs[(dirt + 1), 1];
+            uv01 = World.Instance.blockUVs[(dirt + 1), 2];
+            uv11 = World.Instance.blockUVs[(dirt + 1), 3];
         }
         else
         {
-            uv00 = World.Instance.blockUVs[(int)(bType + 1), 0];
-            uv10 = World.Instance.blockUVs[(int)(bType + 1), 1];
-            uv01 = World.Instance.blockUVs[(int)(bType + 1), 2];
-            uv11 = World.Instance.blockUVs[(int)(bType + 1), 3];
+            uv00 = World.Instance.blockUVs[(bType + 1), 0];
+            uv10 = World.Instance.blockUVs[(bType + 1), 1];
+            uv01 = World.Instance.blockUVs[(bType + 1), 2];
+            uv11 = World.Instance.blockUVs[(bType + 1), 3];
         }
 
         //all possible vertices 
@@ -349,25 +353,25 @@ public void SetNeighbours(Vector3Int vec1){
                     vec.y = y;
 
                     /*
-                    if (chunkData[x,y,z] != BlockType.AIR)
+                    if (chunkData[x,y,z] != air)
                     Draw(chunkData[x,y,z],
-                    y < ymax && chunkData[x, y + 1, z] == BlockType.AIR, 
-                    y > 0 && chunkData[x, y - 1, z] == BlockType.AIR,
-                    z < zmax && chunkData[x, y, z + 1] == BlockType.AIR,
-                    z > 0 && chunkData[x, y, z - 1] == BlockType.AIR, 
-                    x > 0 && chunkData[x - 1, y, z] == BlockType.AIR,
-                    x < xmax && chunkData[x + 1, y, z] == BlockType.AIR);
+                    y < ymax && chunkData[x, y + 1, z] == air, 
+                    y > 0 && chunkData[x, y - 1, z] == air,
+                    z < zmax && chunkData[x, y, z + 1] == air,
+                    z > 0 && chunkData[x, y, z - 1] == air, 
+                    x > 0 && chunkData[x - 1, y, z] == air,
+                    x < xmax && chunkData[x + 1, y, z] == air);
                     */
 
 
-                    if (chunkData[x,y,z] != BlockType.AIR)
+                    if (chunkData[x,y,z] != air)
                     Draw(chunkData[x,y,z],
-                    (y < ymax && chunkData[x, y + 1, z] == BlockType.AIR) || (y == ymax && topNeighbour!= null && topNeighbour.chunkData[x,0,z] == BlockType.AIR) ,
-                    (y > 0 && chunkData[x, y - 1, z] == BlockType.AIR) || (y == 0 && botNeighbour!= null && botNeighbour.chunkData[x,ymax,z] == BlockType.AIR) ,
-                    (z < zmax && chunkData[x, y, z + 1] == BlockType.AIR) || (z == zmax && frontNeighbor != null && frontNeighbor.chunkData[x,y,0] == BlockType.AIR),
-                    (z > 0 && chunkData[x, y, z - 1] == BlockType.AIR) || (z == 0 && backNeighbour != null && backNeighbour.chunkData[x,y,zmax] == BlockType.AIR), 
-                    (x > 0 && chunkData[x - 1, y, z] == BlockType.AIR) || (x == 0 && leftNeighbour != null && leftNeighbour.chunkData[xmax,y,z] == BlockType.AIR),
-                    (x < xmax && chunkData[x + 1, y, z] == BlockType.AIR) || (x == xmax && rightNeighbour != null && rightNeighbour.chunkData[0,y,z] == BlockType.AIR)) ;
+                    (y < ymax && chunkData[x, y + 1, z] == air) || (y == ymax && topNeighbour!= null && topNeighbour.chunkData[x,0,z] == air) ,
+                    (y > 0 && chunkData[x, y - 1, z] == air) || (y == 0 && botNeighbour!= null && botNeighbour.chunkData[x,ymax,z] == air) ,
+                    (z < zmax && chunkData[x, y, z + 1] == air) || (z == zmax && frontNeighbor != null && frontNeighbor.chunkData[x,y,0] == air),
+                    (z > 0 && chunkData[x, y, z - 1] == air) || (z == 0 && backNeighbour != null && backNeighbour.chunkData[x,y,zmax] == air), 
+                    (x > 0 && chunkData[x - 1, y, z] == air) || (x == 0 && leftNeighbour != null && leftNeighbour.chunkData[xmax,y,z] == air),
+                    (x < xmax && chunkData[x + 1, y, z] == air) || (x == xmax && rightNeighbour != null && rightNeighbour.chunkData[0,y,z] == air)) ;
 
 
 
@@ -397,10 +401,10 @@ public void SetNeighbours(Vector3Int vec1){
         //yield return null;
     }
 
-     public void AddBlock(Vector3Int bl, BlockType bType)
+     public void AddBlock(Vector3Int bl, int bType)
     {
         
-        if (chunkData[bl.x, bl.y, bl.z] == BlockType.AIR && !beingModified)
+        if (chunkData[bl.x, bl.y, bl.z] == air && !beingModified)
         {
             chunkData[bl.x, bl.y, bl.z] = bType;
             triangles.Clear();
@@ -420,9 +424,9 @@ public void SetNeighbours(Vector3Int vec1){
     public void DeleteBlock(Vector3Int bl)
     {
         
-        if (chunkData[bl.x, bl.y, bl.z] != BlockType.AIR && !beingModified)
+        if (chunkData[bl.x, bl.y, bl.z] != air && !beingModified)
         {
-            chunkData[bl.x, bl.y, bl.z] = BlockType.AIR;
+            chunkData[bl.x, bl.y, bl.z] = air;
             triangles.Clear();
             vertices.Clear();
             uvs.Clear();
@@ -431,15 +435,15 @@ public void SetNeighbours(Vector3Int vec1){
             ReBuildChunk();
         }
 
-        if (bl.x == 0 && leftNeighbour != null && leftNeighbour.chunkData[xmax, bl.y,bl.z] != BlockType.AIR) leftNeighbour.ReBuildChunk(); 
-        else if (bl.x == xmax && rightNeighbour != null && rightNeighbour.chunkData[0, bl.y,bl.z] != BlockType.AIR) rightNeighbour.ReBuildChunk(); 
+        if (bl.x == 0 && leftNeighbour != null && leftNeighbour.chunkData[xmax, bl.y,bl.z] != air) leftNeighbour.ReBuildChunk(); 
+        else if (bl.x == xmax && rightNeighbour != null && rightNeighbour.chunkData[0, bl.y,bl.z] != air) rightNeighbour.ReBuildChunk(); 
 
-        if (bl.z == 0 && backNeighbour != null && backNeighbour.chunkData[bl.x, bl.y,zmax] != BlockType.AIR) backNeighbour.ReBuildChunk(); 
-        else if (bl.z == xmax && frontNeighbor != null && rightNeighbour.chunkData[bl.x, bl.y,0] != BlockType.AIR) frontNeighbor.ReBuildChunk(); 
+        if (bl.z == 0 && backNeighbour != null && backNeighbour.chunkData[bl.x, bl.y,zmax] != air) backNeighbour.ReBuildChunk(); 
+        else if (bl.z == xmax && frontNeighbor != null && rightNeighbour.chunkData[bl.x, bl.y,0] != air) frontNeighbor.ReBuildChunk(); 
 
         
-        if (bl.y == 0 && botNeighbour != null && botNeighbour.chunkData[bl.x, ymax,bl.z] != BlockType.AIR) botNeighbour.ReBuildChunk(); 
-        else if (bl.z == ymax && topNeighbour != null && topNeighbour.chunkData[bl.x, 0,bl.z] != BlockType.AIR) topNeighbour.ReBuildChunk(); 
+        if (bl.y == 0 && botNeighbour != null && botNeighbour.chunkData[bl.x, ymax,bl.z] != air) botNeighbour.ReBuildChunk(); 
+        else if (bl.z == ymax && topNeighbour != null && topNeighbour.chunkData[bl.x, 0,bl.z] != air) topNeighbour.ReBuildChunk(); 
 
 
 
