@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockInteraction : MonoBehaviour {
+public class BlockInteraction : HandController {
 
-    public Camera cam;
+    
     public GameObject TestClick;
     public TextMesh tm;
+
+    public float buildLength = 5f;
 	// Use this for initialization
 	void Start () {
 		
@@ -17,13 +19,13 @@ public class BlockInteraction : MonoBehaviour {
 
     //ShowTriangle();
 
-	if (Input.GetMouseButtonDown(0)) {
+	if (controller.mainTriggerDown) {
 
             DestroyBlock();
 
     }
 
-    if (Input.GetMouseButtonDown(1)){
+    if (controller.gripTriggerDown){
         AddBlock();
     }
 	}
@@ -31,7 +33,7 @@ public class BlockInteraction : MonoBehaviour {
     public void DestroyBlock() {
 
         RaycastHit hit;
-        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, 10)) {
+        if (Physics.Raycast(transform.position, transform.forward, out hit, buildLength)) {
 
             if (hit.collider.tag == "Chunk") {
 
@@ -59,7 +61,7 @@ public class BlockInteraction : MonoBehaviour {
 
 public void AddBlock(){
     RaycastHit hit;
-        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, 10)) {
+        if (Physics.Raycast(transform.position, transform.forward, out hit, buildLength)) {
 
             if (hit.collider.tag == "Chunk") {
 
@@ -86,7 +88,7 @@ public void AddBlock(){
 
 public void ShowTriangle(){
      RaycastHit hit;
-        if (!Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition), out hit))
+        if (!Physics.Raycast(transform.position, transform.forward, out hit, buildLength))
             return;
 
         MeshCollider meshCollider = hit.collider as MeshCollider;
