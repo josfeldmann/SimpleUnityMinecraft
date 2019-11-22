@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,12 +9,12 @@ using Unity.Collections;
 
 public class Chunk : MonoBehaviour {
 
-    public const int grass = 0, dirt = 1, stone = 2, water = 3, air = 250;
+    public const int grass = 0, dirt = 1, stones = 2, water = 3, air = 250;
 
 
 
-    //public int[,,] chunkData;
-    public NativeArray<int> chunkData;
+    public int[,,] chunkData;
+    NativeArray<int> native;
    
 
     float currChunkHeight;
@@ -58,14 +58,11 @@ public void SetNeighbours(Vector3Int vec1){
 
     int x, z, y;
     bool prevair, watertop;
-    int chunkSize, chunkHeight;
 
     public void BuildMap() {
 
-        //chunkData.Dispose();
-        chunkData = new NativeArray<int>(World.Instance.chunkSize * World.Instance.chunkheight * World.Instance.chunkSize, Allocator.Persistent);
-        chunkSize = World.Instance.chunkSize;
-        chunkHeight = World.Instance.chunkheight;
+        chunkData = new int[World.Instance.chunkSize, World.Instance.chunkheight, World.Instance.chunkSize];
+
        
         int currheight;
 
@@ -79,9 +76,9 @@ public void SetNeighbours(Vector3Int vec1){
                     
                     if (World.Instance.n.fBM3D((int)(x + transform.position.x), (int)(y + transform.position.y), (int)(z + transform.position.z), 0.1f, 3) < 0.42f) {
                         if (prevair && watertop && y < World.Instance.WaterHeight)
-                            chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = water;
-                            else if (y < World.Instance.WaterHeight && prevair) chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = water;
-                            else chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = air;
+                            chunkData[x, y, z] = water;
+                            else if (y < World.Instance.WaterHeight && prevair) chunkData[x, y, z] = water;
+                            else chunkData[x, y, z] = air;
 
                     }
 
@@ -89,20 +86,18 @@ public void SetNeighbours(Vector3Int vec1){
                      else if (y + transform.position.y <= World.Instance.n.OldGenerateHeight(x + transform.position.x, z + transform.position.z)) {
                         if (prevair) {
                             prevair = false;
-                            chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = grass;
+                            chunkData[x, y, z] = grass;
                         }
-                        else if (y + transform.position.y < 30 ) {
-                            chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = stone;
-                        } else {
-                            chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = dirt;
+                        else {
+                            chunkData[x, y, z] = dirt;
                         }
 
                     }
-                    else if (y + transform.position.y < World.Instance.WaterHeight) {
-                        chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = water;
+                    else if (y < World.Instance.WaterHeight) {
+                        chunkData[x, y, z] = water;
                     }
                     else {
-                        chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = air;
+                        chunkData[x, y, z] = air;
                     }
                     
                 }
@@ -117,7 +112,7 @@ public void SetNeighbours(Vector3Int vec1){
             
 
 
-            return chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] == air;
+            return chunkData[x, y, z] == air;
 
         
     }
@@ -360,25 +355,25 @@ public void SetNeighbours(Vector3Int vec1){
                     vec.y = y;
 
                     /*
-                    if (chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] != air)
-                    Draw(chunkData[x * chunkHeight * chunkSize + y * chunkSize + z],
+                    if (chunkData[x,y,z] != air)
+                    Draw(chunkData[x,y,z],
                     y < ymax && chunkData[x, y + 1, z] == air, 
                     y > 0 && chunkData[x, y - 1, z] == air,
-                    z < zmax && chunkData[x * chunkHeight * chunkSize + y * chunkSize + z + 1] == air,
-                    z > 0 && chunkData[x * chunkHeight * chunkSize + y * chunkSize + z - 1] == air, 
+                    z < zmax && chunkData[x, y, z + 1] == air,
+                    z > 0 && chunkData[x, y, z - 1] == air, 
                     x > 0 && chunkData[x - 1, y, z] == air,
                     x < xmax && chunkData[x + 1, y, z] == air);
                     */
 
 
-                    if (chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] != air)
-                    Draw(chunkData[x * chunkHeight * chunkSize + y * chunkSize + z],
-                    (y < ymax && chunkData[x * chunkHeight * chunkSize + (y + 1) * chunkSize + z] == air) || (y == ymax && topNeighbour!= null && topNeighbour.chunkData[x * chunkHeight * chunkSize + z] == air) ,
-                    (y > 0 && chunkData[x * chunkHeight * chunkSize + (y-1) * chunkSize + z] == air) || (y == 0 && botNeighbour!= null && botNeighbour.chunkData[x * chunkHeight * chunkSize + ymax * chunkSize + z] == air) ,
-                    (z < zmax && chunkData[x * chunkHeight * chunkSize + y * chunkSize + z + 1] == air) || (z == zmax && frontNeighbor != null && frontNeighbor.chunkData[x * chunkHeight * chunkSize + y * chunkSize] == air),
-                    (z > 0 && chunkData[x * chunkHeight * chunkSize + y * chunkSize + z - 1] == air) || (z == 0 && backNeighbour != null && backNeighbour.chunkData[x * chunkHeight * chunkSize + y * chunkSize + zmax] == air), 
-                    (x > 0 && chunkData[(x - 1) * chunkHeight * chunkSize + y * chunkSize + z] == air) || (x == 0 && leftNeighbour != null && leftNeighbour.chunkData[xmax * chunkHeight * chunkSize + y * chunkSize + z] == air),
-                    (x < xmax && chunkData[(x + 1) * chunkHeight * chunkSize + y * chunkSize + z] == air) || (x == xmax && rightNeighbour != null && rightNeighbour.chunkData[y * chunkSize + z] == air)) ;
+                    if (chunkData[x,y,z] != air)
+                    Draw(chunkData[x,y,z],
+                    (y < ymax && chunkData[x, y + 1, z] == air) || (y == ymax && topNeighbour!= null && topNeighbour.chunkData[x,0,z] == air) ,
+                    (y > 0 && chunkData[x, y - 1, z] == air) || (y == 0 && botNeighbour!= null && botNeighbour.chunkData[x,ymax,z] == air) ,
+                    (z < zmax && chunkData[x, y, z + 1] == air) || (z == zmax && frontNeighbor != null && frontNeighbor.chunkData[x,y,0] == air),
+                    (z > 0 && chunkData[x, y, z - 1] == air) || (z == 0 && backNeighbour != null && backNeighbour.chunkData[x,y,zmax] == air), 
+                    (x > 0 && chunkData[x - 1, y, z] == air) || (x == 0 && leftNeighbour != null && leftNeighbour.chunkData[xmax,y,z] == air),
+                    (x < xmax && chunkData[x + 1, y, z] == air) || (x == xmax && rightNeighbour != null && rightNeighbour.chunkData[0,y,z] == air)) ;
 
 
 
@@ -410,14 +405,10 @@ public void SetNeighbours(Vector3Int vec1){
 
      public void AddBlock(Vector3Int bl, int bType)
     {
-        x = bl.x;
-        y = bl.y;
-        z = bl.z;
         
-        
-        if (chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] == air && !beingModified)
+        if (chunkData[bl.x, bl.y, bl.z] == air && !beingModified)
         {
-            chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = bType;
+            chunkData[bl.x, bl.y, bl.z] = bType;
             triangles.Clear();
             vertices.Clear();
             uvs.Clear();
@@ -434,14 +425,10 @@ public void SetNeighbours(Vector3Int vec1){
 
     public void DeleteBlock(Vector3Int bl)
     {
-
-           x = bl.x;
-        y = bl.y;
-        z = bl.z;
         
-        if (chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] != air && !beingModified)
+        if (chunkData[bl.x, bl.y, bl.z] != air && !beingModified)
         {
-            chunkData[x * chunkHeight * chunkSize + y * chunkSize + z] = air;
+            chunkData[bl.x, bl.y, bl.z] = air;
             triangles.Clear();
             vertices.Clear();
             uvs.Clear();
@@ -450,15 +437,15 @@ public void SetNeighbours(Vector3Int vec1){
             ReBuildChunk();
         }
 
-        if (bl.x == 0 && leftNeighbour != null && leftNeighbour.chunkData[xmax * chunkHeight * chunkSize + y * chunkSize + z] != air) leftNeighbour.ReBuildChunk(); 
-        else if (bl.x == xmax && rightNeighbour != null && rightNeighbour.chunkData[0 * chunkHeight * chunkSize + y * chunkSize + z] != air) rightNeighbour.ReBuildChunk(); 
+        if (bl.x == 0 && leftNeighbour != null && leftNeighbour.chunkData[xmax, bl.y,bl.z] != air) leftNeighbour.ReBuildChunk(); 
+        else if (bl.x == xmax && rightNeighbour != null && rightNeighbour.chunkData[0, bl.y,bl.z] != air) rightNeighbour.ReBuildChunk(); 
 
-        if (bl.z == 0 && backNeighbour != null && backNeighbour.chunkData[x * chunkHeight * chunkSize + y * chunkSize + zmax] != air) backNeighbour.ReBuildChunk(); 
-        else if (bl.z == xmax && frontNeighbor != null && rightNeighbour.chunkData[x * chunkHeight * chunkSize + y * chunkSize + 0] != air) frontNeighbor.ReBuildChunk(); 
+        if (bl.z == 0 && backNeighbour != null && backNeighbour.chunkData[bl.x, bl.y,zmax] != air) backNeighbour.ReBuildChunk(); 
+        else if (bl.z == xmax && frontNeighbor != null && rightNeighbour.chunkData[bl.x, bl.y,0] != air) frontNeighbor.ReBuildChunk(); 
 
         
-        if (bl.y == 0 && botNeighbour != null && botNeighbour.chunkData[x * chunkHeight * chunkSize + ymax * chunkSize + z] != air) botNeighbour.ReBuildChunk(); 
-        else if (bl.z == ymax && topNeighbour != null && topNeighbour.chunkData[x * chunkHeight * chunkSize + 0 * chunkSize + z] != air) topNeighbour.ReBuildChunk(); 
+        if (bl.y == 0 && botNeighbour != null && botNeighbour.chunkData[bl.x, ymax,bl.z] != air) botNeighbour.ReBuildChunk(); 
+        else if (bl.z == ymax && topNeighbour != null && topNeighbour.chunkData[bl.x, 0,bl.z] != air) topNeighbour.ReBuildChunk(); 
 
 
 
@@ -495,37 +482,4 @@ public void SetNeighbours(Vector3Int vec1){
 
 
     }
-
-
-    private void OnDestroy() {
-        chunkData.Dispose();
-    }
-
-
-
-
-
-struct CalculateJob : IJobParallelFor
-    {
-        public NativeArray<Vector3> vertices;
-
-        public float sineTime;
-
-        public float strength;
-
-        public void Execute(int i)
-        {
-            var vertex = vertices[i];
-            var perlin = Mathf.PerlinNoise(vertex.z, vertex.y) * strength;
-            var noise = Vector3.one * perlin;
-            var sine = Vector3.one * sineTime * strength;
-
-            vertex = vertex - sine + noise;
-
-            vertices[i] = vertex;
-        }
-    }
-
-
-
 }

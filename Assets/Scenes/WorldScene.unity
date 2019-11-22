@@ -681,7 +681,7 @@ MonoBehaviour:
   mat: {fileID: 2100000, guid: b64894e845e882d42ae941c743b6c2bb, type: 2}
   chunkSize: 16
   worldheight: 2
-  chunkheight: 30
+  chunkheight: 50
   initialWorldSize: 5
   WaterHeight: 0
   chunk: {fileID: 1860415453659156, guid: bcc9f1d6519df594d9cf2c91993b457d, type: 3}
