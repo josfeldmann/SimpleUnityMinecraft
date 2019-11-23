@@ -31,6 +31,9 @@ public class PCPlayerController : MonoBehaviour {
 
     private Vector3 moveDirection = Vector3.zero;
     private CharacterController controller;
+
+
+    public BlockInteraction blockInteraction;
     
     void Start () {
         controller = GetComponent<CharacterController>();
@@ -65,6 +68,17 @@ public class PCPlayerController : MonoBehaviour {
                 moveDirection.y = jumpSpeed;
             }
         }
+
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            print("Click");
+            blockInteraction.DestroyBlock();
+        }
+
+
+
+        if ((Input.GetMouseButtonDown(1))) blockInteraction.AddBlock();
 
         // Apply gravity
         moveDirection.y = moveDirection.y - (gravity * Time.deltaTime);

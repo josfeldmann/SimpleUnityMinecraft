@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockInteraction : HandController {
+public class BlockInteraction :MonoBehaviour {
 
     
     public GameObject TestClick;
     public TextMesh tm;
 
-    public float buildLength = 5f;
+    public float buildLength = 10f;
 	// Use this for initialization
 	void Start () {
 		
@@ -19,21 +19,23 @@ public class BlockInteraction : HandController {
 
     //ShowTriangle();
 
-	if (controller.mainTriggerDown) {
+	//if (controller.mainTriggerDown) {
 
-            DestroyBlock();
+        //    DestroyBlock();
 
-    }
+   // }
 
-    if (controller.gripTriggerDown){
-        AddBlock();
-    }
+   // if (controller.gripTriggerDown){
+       // AddBlock();
+   // }
 	}
 
     public void DestroyBlock() {
 
+        
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.forward, out hit, buildLength)) {
+            print(hit.collider.name);
 
             if (hit.collider.tag == "Chunk") {
 
