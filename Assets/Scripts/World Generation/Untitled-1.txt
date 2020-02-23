@@ -1,0 +1,1 @@
+x * chunkHeight * chunkSize + y * chunkSize + z
